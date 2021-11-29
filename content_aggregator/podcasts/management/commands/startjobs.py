@@ -1,12 +1,26 @@
 
+# Standard library
+import logging
+
+# Django
+from django.conf import settings
+from django.core.management.base import BaseCommand
+
+# Third party
 import feedparser
 from dateutil import parser
-from django.core.management.base import BaseCommand
+from apscheduler.schedulers.blocking import BlockingScheduler
+from apscheduler.triggers.cron import CronTrigger
+from django_apscheduler.jobstores import DjangoJobStore
+from django_apscheduler.models import DjangoJobExecution
+
+# Models
 from podcasts.models import Episode
 
 # podcast URL:
 PODCAST_URLs = [r"https://realpython.com/podcasts/rpp/feed", r"https://talkpython.fm/episodes/rss"]
 
+logger = logging.getLogger(__name__)
 
 def save_new_episodes(feed):
     podcast_title = feed.channel.title
@@ -31,8 +45,42 @@ def parse_new_feed():
         _feed = feedparser.parse(url)
         save_new_episodes(_feed)
 
+def delete_old_job_executions(max_age=604_800):
+    DjangoJobExecution.objects.delete_old_job_executions(max_age)
+
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        parse_new_feed()
+        scheduler = BlockingScheduler(timezone=settings.TIME_ZONE)
+        scheduler.add_jobstore(DjangoJobStore(), "default")
+
+        scheduler.add_job(
+            parse_new_feed,
+            trigger="interval",
+            minutes=10,
+            id="Podcasts",
+            max_instances=1,
+            replace_existing=True,
+        )
+        logger.info("Added job: New podcasts")
+
+        scheduler.add_job(
+            delete_old_job_executions,
+            trigger=CronTrigger(
+                day_of_week="mon", hour="00", minute="00"
+            ),
+            id="Delete Old Job Executions",
+            max_instances=1,
+            replace_existing=True,
+        )
+        logger.info("Added weekly job: Delete Old Job Executions.")
+
+        try:
+            logger.info("Starting scheduler ...")
+            scheduler.start()
+        except KeyboardInterrupt:
+            logger.info("Stopping scheduler ...")
+            scheduler.shutdown()
+            logger.info("Scheduler shut down successfully!")
+
 
