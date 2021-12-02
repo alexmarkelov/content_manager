@@ -18,9 +18,12 @@ from django_apscheduler.models import DjangoJobExecution
 from podcasts.models import Episode
 
 # podcast URL:
-PODCAST_URLs = [r"https://realpython.com/podcasts/rpp/feed", r"https://talkpython.fm/episodes/rss"]
+PODCAST_URLs = [r"https://realpython.com/podcasts/rpp/feed",
+                r"https://talkpython.fm/episodes/rss",
+                r"https://www.pythonpodcast.com/feed/mp3/"]
 
 logger = logging.getLogger(__name__)
+
 
 def save_new_episodes(feed):
     podcast_title = feed.channel.title
@@ -44,6 +47,7 @@ def parse_new_feed():
     for url in PODCAST_URLs:
         _feed = feedparser.parse(url)
         save_new_episodes(_feed)
+
 
 def delete_old_job_executions(max_age=604_800):
     DjangoJobExecution.objects.delete_old_job_executions(max_age)
@@ -82,5 +86,3 @@ class Command(BaseCommand):
             logger.info("Stopping scheduler ...")
             scheduler.shutdown()
             logger.info("Scheduler shut down successfully!")
-
-
