@@ -15,18 +15,17 @@ from django_apscheduler.jobstores import DjangoJobStore
 from django_apscheduler.models import DjangoJobExecution
 
 # Models
-from podcasts.models import Episode
+from podcasts.models import Episode, FeedChannel
 
 # podcast URL:
 PODCAST_URLs = [r"https://realpython.com/podcasts/rpp/feed",
-                r"https://talkpython.fm/episodes/rss",
                 r"https://www.pythonpodcast.com/feed/mp3/"]
 
 logger = logging.getLogger(__name__)
 
 
-def save_new_episodes(feed):
-    podcast_title = feed.channel.title
+def save_new_episodes(feed, channel):
+    podcast_title = channel
     podcast_image = feed.channel.image["href"]
 
     for item in feed.entries:
@@ -44,9 +43,9 @@ def save_new_episodes(feed):
 
 
 def parse_new_feed():
-    for url in PODCAST_URLs:
-        _feed = feedparser.parse(url)
-        save_new_episodes(_feed)
+    for channel in FeedChannel.objects.all():
+        _feed = feedparser.parse(channel.url)
+        save_new_episodes(_feed, channel)
 
 
 def delete_old_job_executions(max_age=604_800):
