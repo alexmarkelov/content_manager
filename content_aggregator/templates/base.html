@@ -36,7 +36,7 @@
 					<hr class="d-block d-lg-none mt-1 mb-0">
 					{% if user.is_authenticated %}
                       <div class="flex-grow-1 ml-3">
-						<a href="{% url 'podcasts:last_podcasts' %}"> <strong>Account</strong>  </a>
+						<a href="{% url 'podcasts:last_podcasts' %}"> <strong>Last podcasts</strong>  </a>
                       </div>
                       <div class="flex-grow-1 ml-3">
                         <a> <strong> User: {{ user.get_username }} </strong></a>

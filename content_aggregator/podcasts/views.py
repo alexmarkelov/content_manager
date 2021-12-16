@@ -12,7 +12,7 @@ class HomePageView(View):
         return render(request, self.template_name)
 
 
-class LastPodcastsView(LoginRequiredMixin, ListView):
+class LastPodcastsView(ListView):
     template_name = "podcasts/last_podcasts.html"
     model = Episode
 
