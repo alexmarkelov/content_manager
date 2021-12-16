@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # my apps
+    'accounts.apps.AccountsConfig',
     'podcasts.apps.PodcastsConfig',
     # other apps
     "django_apscheduler",
