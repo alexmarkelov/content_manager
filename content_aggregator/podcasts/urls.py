@@ -1,6 +1,9 @@
-from django.urls import path
-from .views import HomePageView
+from django.urls import path, include
+from .views import LastPodcastsView, HomePageView
 
+
+app_name = 'podcasts'
 urlpatterns = [
-    path("", HomePageView.as_view(), name="homepage")
+    path('last/', LastPodcastsView.as_view(), name="last_podcasts"),
+    path('', HomePageView.as_view(), name="homepage"),
 ]

@@ -17,9 +17,6 @@ from django_apscheduler.models import DjangoJobExecution
 # Models
 from podcasts.models import Episode, FeedChannel
 
-# podcast URL:
-PODCAST_URLs = [r"https://realpython.com/podcasts/rpp/feed",
-                r"https://www.pythonpodcast.com/feed/mp3/"]
 
 logger = logging.getLogger(__name__)
 
